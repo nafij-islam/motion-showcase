@@ -5,12 +5,14 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomCursor from '@/components/CustomCursor';
 import MagneticButton from '@/components/MagneticButton';
+import RevealText from '@/components/RevealText';
+import TextScramble from '@/components/TextScramble';
 import { toast } from 'sonner';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Contact page with animated form and floating shapes
+ * Contact page with advanced form animations
  */
 const Contact = () => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -22,56 +24,69 @@ const Contact = () => {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Hero text animation
-      gsap.from('.contact-hero-text', {
-        y: 60,
+      gsap.from('.contact-hero-element', {
+        y: 80,
         opacity: 0,
-        stagger: 0.15,
-        duration: 1,
-        ease: 'power3.out',
+        stagger: 0.12,
+        duration: 1.2,
+        ease: 'power4.out',
         delay: 0.3,
       });
 
-      // Form fields animation
-      const inputs = formRef.current?.querySelectorAll('.form-field');
-      inputs?.forEach((input, i) => {
-        gsap.from(input, {
-          y: 40,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-          delay: 0.5 + i * 0.1,
-        });
+      // Form fields stagger animation
+      gsap.from('.form-field', {
+        y: 60,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: 'power3.out',
+        delay: 0.6,
       });
 
-      // Floating shapes animation
+      // Floating shapes animation with complex paths
       const shapes = shapesRef.current?.querySelectorAll('.shape');
       shapes?.forEach((shape, i) => {
-        gsap.to(shape, {
-          y: `random(-30, 30)`,
-          x: `random(-20, 20)`,
-          rotation: `random(-15, 15)`,
-          duration: `random(3, 5)`,
-          repeat: -1,
-          yoyo: true,
+        // Create more complex floating animation
+        const tl = gsap.timeline({ repeat: -1, yoyo: true });
+        tl.to(shape, {
+          y: `random(-40, 40)`,
+          x: `random(-30, 30)`,
+          rotation: `random(-20, 20)`,
+          scale: `random(0.9, 1.1)`,
+          duration: `random(4, 7)`,
           ease: 'sine.inOut',
-          delay: i * 0.2,
         });
       });
 
       // Info cards animation
       gsap.from('.info-card', {
-        x: -40,
+        x: -60,
         opacity: 0,
+        rotateY: -20,
         stagger: 0.15,
-        duration: 0.8,
+        duration: 1,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: '.info-section',
           start: 'top 80%',
+        },
+      });
+
+      // Social links animation
+      gsap.from('.social-link', {
+        scale: 0,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.5,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+          trigger: '.social-links',
+          start: 'top 85%',
         },
       });
     });
@@ -90,17 +105,22 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Animate button
+    // Button animation
     gsap.to('.submit-btn', {
       scale: 0.95,
       duration: 0.1,
-      yoyo: true,
-      repeat: 1,
     });
 
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Success animation
+    gsap.to('.submit-btn', {
+      scale: 1,
+      duration: 0.3,
+      ease: 'back.out(1.7)',
+    });
+
     toast.success('Message sent successfully! I\'ll get back to you soon.');
     setFormState({ name: '', email: '', subject: '', message: '' });
     setIsSubmitting(false);
@@ -112,6 +132,12 @@ const Contact = () => {
     { label: 'Location', value: 'San Francisco, CA', icon: '◎' },
   ];
 
+  const formFields = [
+    { name: 'name', label: 'Name', type: 'text', placeholder: 'Your name' },
+    { name: 'email', label: 'Email', type: 'email', placeholder: 'your@email.com' },
+    { name: 'subject', label: 'Subject', type: 'text', placeholder: 'Project inquiry' },
+  ];
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <CustomCursor />
@@ -119,22 +145,25 @@ const Contact = () => {
 
       {/* Floating shapes background */}
       <div ref={shapesRef} className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="shape absolute top-20 left-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
-        <div className="shape absolute top-40 right-20 w-48 h-48 bg-primary/10 rounded-full blur-3xl" />
-        <div className="shape absolute bottom-40 left-1/4 w-24 h-24 bg-primary/5 rounded-full blur-xl" />
-        <div className="shape absolute bottom-20 right-1/3 w-40 h-40 bg-primary/8 rounded-full blur-2xl" />
+        <div className="shape absolute top-[10%] left-[5%] w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
+        <div className="shape absolute top-[30%] right-[10%] w-60 h-60 bg-primary/10 rounded-full blur-3xl" />
+        <div className="shape absolute bottom-[30%] left-[20%] w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
+        <div className="shape absolute bottom-[10%] right-[25%] w-48 h-48 bg-primary/8 rounded-full blur-3xl" />
+        <div className="shape absolute top-[50%] left-[50%] w-24 h-24 bg-primary/10 rounded-full blur-xl" />
       </div>
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-40 md:pb-20 relative z-10">
         <div className="container-custom text-center max-w-4xl mx-auto">
-          <p className="contact-hero-text text-label text-primary mb-6">Get In Touch</p>
-          <h1 className="contact-hero-text text-display-lg mb-8">
+          <p className="contact-hero-element text-label text-primary mb-6">
+            <TextScramble text="Get In Touch" delay={0.3} />
+          </p>
+          <h1 className="contact-hero-element text-display-lg mb-8">
             Let's work
             <span className="gradient-text"> together</span>
           </h1>
-          <p className="contact-hero-text text-body-lg text-muted-foreground max-w-2xl mx-auto">
-            Have a project in mind? I'd love to hear about it. Send me a message 
+          <p className="contact-hero-element text-body-lg text-muted-foreground max-w-2xl mx-auto">
+            Have a project in mind? I'd love to hear about it. Send me a message
             and let's create something amazing.
           </p>
         </div>
@@ -143,79 +172,90 @@ const Contact = () => {
       {/* Contact Form & Info */}
       <section className="section-padding pt-8 relative z-10">
         <div className="container-custom">
-          <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
             {/* Form */}
             <div>
-              <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
-                <div className="form-field">
-                  <label className="block text-sm font-medium mb-2">Name</label>
-                  <div className="relative">
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
+                {formFields.map((field) => (
+                  <div key={field.name} className="form-field relative">
+                    <label
+                      className={`absolute left-6 transition-all duration-300 pointer-events-none ${
+                        focusedField === field.name || formState[field.name as keyof typeof formState]
+                          ? 'top-2 text-xs text-primary'
+                          : 'top-1/2 -translate-y-1/2 text-muted-foreground'
+                      }`}
+                    >
+                      {field.label}
+                    </label>
                     <input
-                      type="text"
-                      name="name"
-                      value={formState.name}
+                      type={field.type}
+                      name={field.name}
+                      value={formState[field.name as keyof typeof formState]}
                       onChange={handleInputChange}
+                      onFocus={() => setFocusedField(field.name)}
+                      onBlur={() => setFocusedField(null)}
                       required
-                      className="w-full px-6 py-4 bg-card border border-border rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 text-foreground"
-                      placeholder="Your name"
+                      className="w-full px-6 pt-7 pb-3 bg-card border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground"
+                    />
+                    {/* Focus line animation */}
+                    <div
+                      className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-500 ${
+                        focusedField === field.name ? 'w-full' : 'w-0'
+                      }`}
                     />
                   </div>
-                </div>
+                ))}
 
-                <div className="form-field">
-                  <label className="block text-sm font-medium mb-2">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formState.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-6 py-4 bg-card border border-border rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 text-foreground"
-                    placeholder="your@email.com"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label className="block text-sm font-medium mb-2">Subject</label>
-                  <input
-                    type="text"
-                    name="subject"
-                    value={formState.subject}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-6 py-4 bg-card border border-border rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 text-foreground"
-                    placeholder="Project inquiry"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label className="block text-sm font-medium mb-2">Message</label>
+                <div className="form-field relative">
+                  <label
+                    className={`absolute left-6 transition-all duration-300 pointer-events-none ${
+                      focusedField === 'message' || formState.message
+                        ? 'top-2 text-xs text-primary'
+                        : 'top-6 text-muted-foreground'
+                    }`}
+                  >
+                    Message
+                  </label>
                   <textarea
                     name="message"
                     value={formState.message}
                     onChange={handleInputChange}
+                    onFocus={() => setFocusedField('message')}
+                    onBlur={() => setFocusedField(null)}
                     required
                     rows={6}
-                    className="w-full px-6 py-4 bg-card border border-border rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 text-foreground resize-none"
-                    placeholder="Tell me about your project..."
+                    className="w-full px-6 pt-8 pb-4 bg-card border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground resize-none"
+                  />
+                  <div
+                    className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-500 ${
+                      focusedField === 'message' ? 'w-full' : 'w-0'
+                    }`}
                   />
                 </div>
 
                 <MagneticButton
-                  className="submit-btn w-full py-4 bg-primary text-primary-foreground rounded-xl text-lg font-medium hover:bg-gold-light transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="submit-btn w-full py-5 bg-primary text-primary-foreground rounded-xl text-lg font-medium relative overflow-hidden group"
                   onClick={() => {}}
                 >
-                  {isSubmitting ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Sending...
-                    </span>
-                  ) : (
-                    'Send Message'
-                  )}
+                  <span className="relative z-10 flex items-center justify-center gap-3">
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:translate-x-1 transition-transform">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    )}
+                  </span>
+                  <div className="absolute inset-0 bg-gold-light translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </MagneticButton>
               </form>
             </div>
@@ -224,17 +264,18 @@ const Contact = () => {
             <div className="info-section">
               <div className="space-y-6">
                 {contactInfo.map((info, i) => (
-                  <div 
+                  <div
                     key={i}
-                    className="info-card p-6 bg-card rounded-2xl border border-border hover:border-primary/30 transition-colors duration-300"
+                    className="info-card p-8 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all duration-500 group cursor-pointer"
+                    style={{ transformStyle: 'preserve-3d' }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-xl text-primary">{info.icon}</span>
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-500">
+                        <span className="text-2xl text-primary">{info.icon}</span>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">{info.label}</p>
-                        <p className="text-lg font-medium">{info.value}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{info.label}</p>
+                        <p className="text-xl font-medium group-hover:text-primary transition-colors">{info.value}</p>
                       </div>
                     </div>
                   </div>
@@ -242,14 +283,14 @@ const Contact = () => {
               </div>
 
               {/* Social links */}
-              <div className="mt-12">
+              <div className="social-links mt-12">
                 <p className="text-label text-muted-foreground mb-6">Connect With Me</p>
-                <div className="flex gap-4">
-                  {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map(social => (
+                <div className="flex flex-wrap gap-4">
+                  {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map((social, i) => (
                     <a
                       key={social}
                       href="#"
-                      className="px-6 py-3 bg-secondary rounded-full text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                      className="social-link px-6 py-3 bg-secondary rounded-full text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                     >
                       {social}
                     </a>
@@ -258,14 +299,31 @@ const Contact = () => {
               </div>
 
               {/* Availability */}
-              <div className="mt-12 p-6 bg-primary/5 rounded-2xl border border-primary/20">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
-                  <span className="text-sm font-medium">Available for new projects</span>
+              <div className="mt-12 p-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 relative overflow-hidden">
+                {/* Animated glow */}
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="relative">
+                      <div className="w-3 h-3 bg-primary rounded-full" />
+                      <div className="absolute inset-0 w-3 h-3 bg-primary rounded-full animate-ping" />
+                    </div>
+                    <span className="text-lg font-medium">Available for new projects</span>
+                  </div>
+                  <p className="text-muted-foreground">
+                    I'm currently taking on new clients. Let's discuss your next project and create something extraordinary together!
+                  </p>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  I'm currently taking on new clients. Let's discuss your next project!
-                </p>
+              </div>
+
+              {/* Quick response */}
+              <div className="mt-8 flex items-center gap-4 text-muted-foreground">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <span>Usually responds within 24 hours</span>
               </div>
             </div>
           </div>
