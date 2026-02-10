@@ -257,7 +257,7 @@ const Index = () => {
       </section>
 
       {/* Featured Projects */}
-      <FeaturedProjects />
+      {/* <FeaturedProjects /> */}
 
       {/* Services Section */}
       <section ref={servicesRef} className="section-padding relative">

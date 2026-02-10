@@ -24,6 +24,8 @@ const projects = [
  * - Clip-path image reveals
  * - Particle burst on hover
  * - Cyan (#00EAFF) accent color
+ * 
+ * FIXED: Hover animation conflicts and card tilt reset issues
  */
 const FeaturedProjects = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -32,6 +34,7 @@ const FeaturedProjects = () => {
   const glowRef = useRef<HTMLDivElement>(null);
   const [activeCard, setActiveCard] = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const hoverTimeline = useRef<gsap.core.Timeline | null>(null);
 
   // Glow follow cursor
   useEffect(() => {
@@ -231,34 +234,44 @@ const FeaturedProjects = () => {
     return () => ctx.revert();
   }, []);
 
-  // Card hover animations
+  // Card hover animations - FIXED VERSION
   const handleCardEnter = (index: number, e: React.MouseEvent) => {
     setActiveCard(index);
     const card = e.currentTarget;
 
-    gsap.to(card, {
-      scale: 1.02,
-      duration: 0.4,
-      ease: 'power3.out',
-    });
+    // Kill any existing timeline to prevent conflicts
+    if (hoverTimeline.current) {
+      hoverTimeline.current.kill();
+    }
 
-    gsap.to(card.querySelector('.fp-image'),  {
-      scale: 1.15,
-      duration: 0.8,
-      ease: 'power3.out',
-    });
+    // Create a new timeline for hover in
+    hoverTimeline.current = gsap.timeline();
 
-    gsap.to(card.querySelector('.fp-overlay'), {
-      opacity: 1,
-      duration: 0.4,
-    });
-
-    gsap.to(card.querySelector('.fp-view-btn'), {
-      scale: 1,
-      opacity: 1,
-      duration: 0.5,
-      ease: 'back.out(1.7)',
-    });
+    hoverTimeline.current
+      .to(card, {
+        scale: 1.02,
+        duration: 0.4,
+        ease: 'power3.out',
+      }, 0)
+      .to(card.querySelector('.fp-image'), {
+        scale: 1.15,
+        duration: 0.8,
+        ease: 'power3.out',
+      }, 0)
+      .to(card.querySelector('.fp-overlay'), {
+        opacity: 1,
+        duration: 0.4,
+      }, 0)
+      .to(card.querySelector('.fp-view-btn'), {
+        scale: 1,
+        opacity: 1,
+        duration: 0.5,
+        ease: 'back.out(1.7)',
+      }, 0.1)
+      .to(card.querySelector('.fp-border-glow'), {
+        opacity: 1,
+        duration: 0.4,
+      }, 0);
 
     // Glitch effect on number
     const num = card.querySelector('.fp-number');
@@ -271,27 +284,53 @@ const FeaturedProjects = () => {
         gsap.set(num, { textShadow: 'none' });
       },
     });
-
-    // Cyan border glow
-    gsap.to(card.querySelector('.fp-border-glow'), {
-      opacity: 1,
-      duration: 0.4,
-    });
   };
 
   const handleCardLeave = (e: React.MouseEvent) => {
     setActiveCard(null);
     const card = e.currentTarget;
 
-    gsap.to(card, { scale: 1, duration: 0.4, ease: 'power3.out' });
-    gsap.to(card.querySelector('.fp-image'), { scale: 1, duration: 0.6 });
-    gsap.to(card.querySelector('.fp-overlay'), { opacity: 0, duration: 0.3 });
-    gsap.to(card.querySelector('.fp-view-btn'), { scale: 0, opacity: 0, duration: 0.3 });
-    gsap.to(card.querySelector('.fp-border-glow'), { opacity: 0, duration: 0.3 });
+    // Kill any existing timeline
+    if (hoverTimeline.current) {
+      hoverTimeline.current.kill();
+    }
+
+    // Create a new timeline for hover out - FIXED: Added rotateX and rotateY reset
+    hoverTimeline.current = gsap.timeline();
+
+    hoverTimeline.current
+      .to(card, {
+        scale: 1,
+        rotateX: 0,  // FIXED: Reset 3D rotation
+        rotateY: 0,  // FIXED: Reset 3D rotation
+        duration: 0.5,
+        ease: 'power3.out',
+      }, 0)
+      .to(card.querySelector('.fp-image'), {
+        scale: 1,
+        duration: 0.6,
+        ease: 'power3.out',
+      }, 0)
+      .to(card.querySelector('.fp-overlay'), {
+        opacity: 0,
+        duration: 0.3,
+      }, 0)
+      .to(card.querySelector('.fp-view-btn'), {
+        scale: 0,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power3.in',
+      }, 0)
+      .to(card.querySelector('.fp-border-glow'), {
+        opacity: 0,
+        duration: 0.3,
+      }, 0);
   };
 
-  // 3D tilt on mouse move
-  const handleCardMove = (e: React.MouseEvent) => {
+  // 3D tilt on mouse move - FIXED: Only apply when card is active
+  const handleCardMove = (index: number, e: React.MouseEvent) => {
+    if (activeCard !== index) return; // FIXED: Only tilt when hovering
+    
     const card = e.currentTarget as HTMLElement;
     const rect = card.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width - 0.5;
@@ -302,6 +341,7 @@ const FeaturedProjects = () => {
       rotateX: -y * 12,
       duration: 0.3,
       ease: 'power3.out',
+      overwrite: 'auto', // FIXED: Allow overwriting
     });
   };
 
@@ -394,7 +434,7 @@ const FeaturedProjects = () => {
               }}
               onMouseEnter={(e) => handleCardEnter(i, e)}
               onMouseLeave={handleCardLeave}
-              onMouseMove={handleCardMove}
+              onMouseMove={(e) => handleCardMove(i, e)}
             >
               {/* Cyan border glow */}
               <div
