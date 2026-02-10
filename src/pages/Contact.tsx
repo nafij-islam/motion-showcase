@@ -5,89 +5,82 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomCursor from '@/components/CustomCursor';
 import MagneticButton from '@/components/MagneticButton';
-import RevealText from '@/components/RevealText';
 import TextScramble from '@/components/TextScramble';
 import { toast } from 'sonner';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * Contact page with advanced form animations
- */
 const Contact = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const shapesRef = useRef<HTMLDivElement>(null);
-  const [formState, setFormState] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
+  const [formState, setFormState] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Hero text animation
-      gsap.from('.contact-hero-element', {
-        y: 80,
-        opacity: 0,
-        stagger: 0.12,
-        duration: 1.2,
-        ease: 'power4.out',
-        delay: 0.3,
-      });
+      // Hero — 3D cinematic text
+      const heroTl = gsap.timeline({ delay: 0.2 });
+      heroTl
+        .fromTo('.contact-hero-line',
+          { y: 120, rotateX: -80, opacity: 0, skewY: 4 },
+          { y: 0, rotateX: 0, opacity: 1, skewY: 0, stagger: 0.1, duration: 1.3, ease: 'power4.out' }
+        )
+        .fromTo('.contact-hero-desc',
+          { y: 30, opacity: 0, filter: 'blur(8px)' },
+          { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out' },
+          '-=0.6'
+        );
 
-      // Form fields stagger animation
-      gsap.from('.form-field', {
-        y: 60,
-        opacity: 0,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: 'power3.out',
-        delay: 0.6,
-      });
+      // Form fields — staggered slide with blur
+      gsap.fromTo('.form-field',
+        { y: 60, opacity: 0, filter: 'blur(5px)' },
+        {
+          y: 0, opacity: 1, filter: 'blur(0px)',
+          stagger: 0.1, duration: 0.8, ease: 'power3.out', delay: 0.5,
+        }
+      );
 
-      // Floating shapes animation with complex paths
+      // Floating shapes — complex orbital paths
       const shapes = shapesRef.current?.querySelectorAll('.shape');
       shapes?.forEach((shape, i) => {
-        // Create more complex floating animation
-        const tl = gsap.timeline({ repeat: -1, yoyo: true });
-        tl.to(shape, {
-          y: `random(-40, 40)`,
-          x: `random(-30, 30)`,
-          rotation: `random(-20, 20)`,
-          scale: `random(0.9, 1.1)`,
-          duration: `random(4, 7)`,
+        const duration = 5 + Math.random() * 5;
+        gsap.to(shape, {
+          y: `random(-50, 50)`,
+          x: `random(-40, 40)`,
+          rotation: `random(-25, 25)`,
+          scale: `random(0.8, 1.2)`,
+          duration,
           ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+          delay: i * 0.5,
         });
       });
 
-      // Info cards animation
-      gsap.from('.info-card', {
-        x: -60,
-        opacity: 0,
-        rotateY: -20,
-        stagger: 0.15,
-        duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: '.info-section',
-          start: 'top 80%',
-        },
-      });
+      // Info cards — 3D entrance from left
+      gsap.fromTo('.info-card',
+        { x: -80, opacity: 0, rotateY: -20, scale: 0.9 },
+        {
+          x: 0, opacity: 1, rotateY: 0, scale: 1,
+          stagger: 0.12, duration: 1, ease: 'power4.out',
+          scrollTrigger: { trigger: '.info-section', start: 'top 80%' },
+        }
+      );
 
-      // Social links animation
-      gsap.from('.social-link', {
-        scale: 0,
-        opacity: 0,
-        stagger: 0.1,
-        duration: 0.5,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: '.social-links',
-          start: 'top 85%',
-        },
+      // Social links — elastic pop
+      gsap.fromTo('.social-link',
+        { scale: 0, opacity: 0, rotateZ: -15 },
+        {
+          scale: 1, opacity: 1, rotateZ: 0,
+          stagger: 0.08, duration: 0.6, ease: 'elastic.out(1, 0.5)',
+          scrollTrigger: { trigger: '.social-links', start: 'top 85%' },
+        }
+      );
+
+      // Availability card pulse glow
+      gsap.to('.avail-glow', {
+        opacity: 0.3, scale: 1.2, repeat: -1, yoyo: true, duration: 2, ease: 'sine.inOut',
       });
     });
 
@@ -95,33 +88,18 @@ const Contact = () => {
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormState(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormState(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Button animation
-    gsap.to('.submit-btn', {
-      scale: 0.95,
-      duration: 0.1,
-    });
-
-    // Simulate form submission
+    gsap.to('.submit-btn', { scale: 0.95, duration: 0.1 });
     await new Promise(resolve => setTimeout(resolve, 2000));
+    gsap.to('.submit-btn', { scale: 1, duration: 0.3, ease: 'back.out(1.7)' });
 
-    // Success animation
-    gsap.to('.submit-btn', {
-      scale: 1,
-      duration: 0.3,
-      ease: 'back.out(1.7)',
-    });
-
-    toast.success('Message sent successfully! I\'ll get back to you soon.');
+    toast.success("Message sent successfully! I'll get back to you soon.");
     setFormState({ name: '', email: '', subject: '', message: '' });
     setIsSubmitting(false);
   };
@@ -133,9 +111,9 @@ const Contact = () => {
   ];
 
   const formFields = [
-    { name: 'name', label: 'Name', type: 'text', placeholder: 'Your name' },
-    { name: 'email', label: 'Email', type: 'email', placeholder: 'your@email.com' },
-    { name: 'subject', label: 'Subject', type: 'text', placeholder: 'Project inquiry' },
+    { name: 'name', label: 'Name', type: 'text' },
+    { name: 'email', label: 'Email', type: 'email' },
+    { name: 'subject', label: 'Subject', type: 'text' },
   ];
 
   return (
@@ -143,28 +121,35 @@ const Contact = () => {
       <CustomCursor />
       <Navigation />
 
-      {/* Floating shapes background */}
+      {/* Floating shapes */}
       <div ref={shapesRef} className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="shape absolute top-[10%] left-[5%] w-40 h-40 bg-primary/5 rounded-full blur-3xl" />
-        <div className="shape absolute top-[30%] right-[10%] w-60 h-60 bg-primary/10 rounded-full blur-3xl" />
-        <div className="shape absolute bottom-[30%] left-[20%] w-32 h-32 bg-primary/5 rounded-full blur-2xl" />
-        <div className="shape absolute bottom-[10%] right-[25%] w-48 h-48 bg-primary/8 rounded-full blur-3xl" />
-        <div className="shape absolute top-[50%] left-[50%] w-24 h-24 bg-primary/10 rounded-full blur-xl" />
+        <div className="shape absolute top-[10%] left-[5%] w-40 h-40 rounded-full blur-3xl" style={{ background: 'hsl(187 100% 50% / 0.05)' }} />
+        <div className="shape absolute top-[30%] right-[10%] w-60 h-60 rounded-full blur-3xl" style={{ background: 'hsl(187 100% 50% / 0.08)' }} />
+        <div className="shape absolute bottom-[30%] left-[20%] w-32 h-32 rounded-full blur-2xl" style={{ background: 'hsl(187 100% 50% / 0.05)' }} />
+        <div className="shape absolute bottom-[10%] right-[25%] w-48 h-48 rounded-full blur-3xl" style={{ background: 'hsl(187 100% 50% / 0.06)' }} />
+        <div className="shape absolute top-[50%] left-[50%] w-24 h-24 rounded-full blur-xl" style={{ background: 'hsl(187 100% 50% / 0.08)' }} />
       </div>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="pt-32 pb-16 md:pt-40 md:pb-20 relative z-10">
-        <div className="container-custom text-center max-w-4xl mx-auto">
-          <p className="contact-hero-element text-label text-primary mb-6">
-            <TextScramble text="Get In Touch" delay={0.3} />
-          </p>
-          <h1 className="contact-hero-element text-display-lg mb-8">
-            Let's work
-            <span className="gradient-text"> together</span>
-          </h1>
-          <p className="contact-hero-element text-body-lg text-muted-foreground max-w-2xl mx-auto">
-            Have a project in mind? I'd love to hear about it. Send me a message
-            and let's create something amazing.
+        <div className="container-custom text-center max-w-4xl mx-auto" style={{ perspective: '1000px' }}>
+          <div className="overflow-hidden mb-6">
+            <p className="contact-hero-line text-label text-primary" style={{ transformStyle: 'preserve-3d' }}>
+              <TextScramble text="Get In Touch" delay={0.3} />
+            </p>
+          </div>
+          <div className="overflow-hidden">
+            <h1 className="contact-hero-line text-display-lg mb-2" style={{ transformStyle: 'preserve-3d' }}>
+              Let's work
+            </h1>
+          </div>
+          <div className="overflow-hidden">
+            <h1 className="contact-hero-line text-display-lg mb-8 gradient-text" style={{ transformStyle: 'preserve-3d' }}>
+              together
+            </h1>
+          </div>
+          <p className="contact-hero-desc text-body-lg text-muted-foreground max-w-2xl mx-auto">
+            Have a project in mind? I'd love to hear about it. Let's create something amazing.
           </p>
         </div>
       </section>
@@ -177,7 +162,7 @@ const Contact = () => {
             <div>
               <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
                 {formFields.map((field) => (
-                  <div key={field.name} className="form-field relative">
+                  <div key={field.name} className="form-field relative group">
                     <label
                       className={`absolute left-6 transition-all duration-300 pointer-events-none ${
                         focusedField === field.name || formState[field.name as keyof typeof formState]
@@ -195,18 +180,23 @@ const Contact = () => {
                       onFocus={() => setFocusedField(field.name)}
                       onBlur={() => setFocusedField(null)}
                       required
-                      className="w-full px-6 pt-7 pb-3 bg-card border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground"
+                      className="w-full px-6 pt-7 pb-3 border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground"
+                      style={{ background: 'hsl(220 15% 7%)' }}
                     />
-                    {/* Focus line animation */}
                     <div
-                      className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-500 ${
+                      className={`absolute bottom-0 left-0 h-0.5 transition-all duration-500 ${
                         focusedField === field.name ? 'w-full' : 'w-0'
                       }`}
+                      style={{ background: 'linear-gradient(90deg, hsl(187 100% 50%), hsl(187 100% 70%))' }}
                     />
+                    {/* Focus glow */}
+                    {focusedField === field.name && (
+                      <div className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 20px hsl(187 100% 50% / 0.1)' }} />
+                    )}
                   </div>
                 ))}
 
-                <div className="form-field relative">
+                <div className="form-field relative group">
                   <label
                     className={`absolute left-6 transition-all duration-300 pointer-events-none ${
                       focusedField === 'message' || formState.message
@@ -224,17 +214,19 @@ const Contact = () => {
                     onBlur={() => setFocusedField(null)}
                     required
                     rows={6}
-                    className="w-full px-6 pt-8 pb-4 bg-card border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground resize-none"
+                    className="w-full px-6 pt-8 pb-4 border-2 border-border rounded-xl focus:border-primary focus:ring-0 outline-none transition-all duration-300 text-foreground resize-none"
+                    style={{ background: 'hsl(220 15% 7%)' }}
                   />
                   <div
-                    className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-500 ${
+                    className={`absolute bottom-0 left-0 h-0.5 transition-all duration-500 ${
                       focusedField === 'message' ? 'w-full' : 'w-0'
                     }`}
+                    style={{ background: 'linear-gradient(90deg, hsl(187 100% 50%), hsl(187 100% 70%))' }}
                   />
                 </div>
 
                 <MagneticButton
-                  className="submit-btn w-full py-5 bg-primary text-primary-foreground rounded-xl text-lg font-medium relative overflow-hidden group"
+                  className="submit-btn w-full py-5 bg-primary text-primary-foreground rounded-xl text-lg font-medium relative overflow-hidden group glow-cyan"
                   onClick={() => {}}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-3">
@@ -255,23 +247,23 @@ const Contact = () => {
                       </>
                     )}
                   </span>
-                  <div className="absolute inset-0 bg-gold-light translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </MagneticButton>
               </form>
             </div>
 
             {/* Contact Info */}
-            <div className="info-section">
+            <div className="info-section" style={{ perspective: '800px' }}>
               <div className="space-y-6">
                 {contactInfo.map((info, i) => (
                   <div
                     key={i}
-                    className="info-card p-8 bg-card rounded-2xl border border-border hover:border-primary/30 transition-all duration-500 group cursor-pointer"
-                    style={{ transformStyle: 'preserve-3d' }}
+                    className="info-card p-8 rounded-2xl border border-border hover:border-primary/30 transition-all duration-500 group cursor-pointer relative overflow-hidden"
+                    style={{ transformStyle: 'preserve-3d', background: 'hsl(220 15% 7%)' }}
                   >
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-500">
-                        <span className="text-2xl text-primary">{info.icon}</span>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at 0% 50%, hsl(187 100% 50% / 0.06), transparent 60%)' }} />
+                    <div className="flex items-center gap-6 relative z-10">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-all duration-500" style={{ background: 'hsl(187 100% 50% / 0.1)' }}>
+                        <span className="text-2xl text-primary group-hover:drop-shadow-[0_0_10px_hsla(187,100%,50%,0.5)]">{info.icon}</span>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground mb-1">{info.label}</p>
@@ -282,15 +274,26 @@ const Contact = () => {
                 ))}
               </div>
 
-              {/* Social links */}
+              {/* Social */}
               <div className="social-links mt-12">
                 <p className="text-label text-muted-foreground mb-6">Connect With Me</p>
                 <div className="flex flex-wrap gap-4">
-                  {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map((social, i) => (
+                  {['Twitter', 'LinkedIn', 'Dribbble', 'GitHub'].map((social) => (
                     <a
                       key={social}
                       href="#"
-                      className="social-link px-6 py-3 bg-secondary rounded-full text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                      className="social-link px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 hover:shadow-[0_0_20px_hsla(187,100%,50%,0.15)]"
+                      style={{ 
+                        background: 'hsl(220 15% 12%)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.target as HTMLElement).style.background = 'hsl(187 100% 50%)';
+                        (e.target as HTMLElement).style.color = 'hsl(220 20% 4%)';
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.target as HTMLElement).style.background = 'hsl(220 15% 12%)';
+                        (e.target as HTMLElement).style.color = '';
+                      }}
                     >
                       {social}
                     </a>
@@ -299,10 +302,8 @@ const Contact = () => {
               </div>
 
               {/* Availability */}
-              <div className="mt-12 p-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent rounded-2xl border border-primary/20 relative overflow-hidden">
-                {/* Animated glow */}
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-                
+              <div className="mt-12 p-8 rounded-2xl border relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(187 100% 50% / 0.08), hsl(187 100% 50% / 0.02))', borderColor: 'hsl(187 100% 50% / 0.15)' }}>
+                <div className="avail-glow absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-20" style={{ background: 'hsl(187 100% 50%)' }} />
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="relative">
@@ -312,12 +313,11 @@ const Contact = () => {
                     <span className="text-lg font-medium">Available for new projects</span>
                   </div>
                   <p className="text-muted-foreground">
-                    I'm currently taking on new clients. Let's discuss your next project and create something extraordinary together!
+                    I'm currently taking on new clients. Let's create something extraordinary together!
                   </p>
                 </div>
               </div>
 
-              {/* Quick response */}
               <div className="mt-8 flex items-center gap-4 text-muted-foreground">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" />
