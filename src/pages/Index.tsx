@@ -143,44 +143,6 @@ const Index = () => {
         },
       });
 
-      // Horizontal scroll for projects
-      const scrollContainer = horizontalInnerRef.current;
-      if (scrollContainer) {
-        const scrollWidth = scrollContainer.scrollWidth;
-        const viewportWidth = window.innerWidth;
-
-        gsap.to(scrollContainer, {
-          x: -(scrollWidth - viewportWidth + 100),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: horizontalRef.current,
-            start: 'top top',
-            end: () => `+=${scrollWidth}`,
-            scrub: 1.5,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-
-        // Project cards animation
-        const projectCards = scrollContainer.querySelectorAll('.h-project');
-        projectCards.forEach((card, i) => {
-          gsap.from(card, {
-            scale: 0.8,
-            opacity: 0,
-            rotateY: -15,
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: card,
-              containerAnimation: gsap.to(scrollContainer, { x: 0 }),
-              start: 'left 80%',
-              toggleActions: 'play none none reverse',
-            },
-          });
-        });
-      }
-
       // Services cards 3D rotation on scroll
       const serviceCards = servicesRef.current?.querySelectorAll('.service-card');
       serviceCards?.forEach((card, i) => {
