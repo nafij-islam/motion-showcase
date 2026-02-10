@@ -6,6 +6,7 @@ import Lenis from 'lenis';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomCursor from '@/components/CustomCursor';
+import FeaturedProjects from '@/components/FeaturedProjects';
 import MagneticButton from '@/components/MagneticButton';
 import TextScramble from '@/components/TextScramble';
 import RevealText from '@/components/RevealText';
