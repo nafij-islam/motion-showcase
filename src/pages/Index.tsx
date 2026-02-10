@@ -351,76 +351,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Horizontal Scroll Projects */}
-      <section ref={horizontalRef} className="h-screen">
-        <div className="h-full flex items-center">
-          <div ref={horizontalInnerRef} className="flex gap-8 pl-20 pr-[50vw]">
-            {/* Section title */}
-            <div className="shrink-0 w-[40vw] flex flex-col justify-center pr-20">
-              <p className="text-label text-primary mb-4">Selected Works</p>
-              <h2 className="text-display-md mb-6">
-                Featured
-                <span className="gradient-text"> Projects</span>
-              </h2>
-              <p className="text-muted-foreground text-lg mb-8">
-                Explore my latest work showcasing creative solutions for brands worldwide.
-              </p>
-              <Link to="/projects" className="inline-flex items-center gap-2 text-primary hover:gap-4 transition-all">
-                View All Projects
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-
-            {/* Project cards */}
-            {projects.map((project, i) => (
-              <Link
-                key={i}
-                to="/projects"
-                className="h-project shrink-0 w-[70vw] md:w-[40vw] group"
-                style={{ perspective: '1000px' }}
-              >
-                <div className="relative h-[70vh] rounded-3xl overflow-hidden bg-card">
-                  <ParallaxImage
-                    src={project.image}
-                    alt={project.title}
-                    className="absolute inset-0"
-                    speed={0.2}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-transparent" />
-                  
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-                    <p className="text-primary text-sm mb-2">{project.category}</p>
-                    <h3 className="text-3xl md:text-4xl font-display font-bold group-hover:text-primary transition-colors">
-                      {project.title}
-                    </h3>
-                  </div>
-
-                  {/* Arrow */}
-                  <div className="absolute top-8 right-8 w-12 h-12 rounded-full border border-foreground/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="group-hover:rotate-45 transition-transform duration-300"
-                    >
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Featured Projects */}
+      <FeaturedProjects />
 
       {/* Services Section */}
       <section ref={servicesRef} className="section-padding">
